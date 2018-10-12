@@ -11,25 +11,41 @@ import org.serviceflow.example.fizzbuzz.core.Core;
 import org.serviceflow.example.fizzbuzz.core.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
- 
-@Path("/play")
+
+/**
+ * 
+ * Handles any requests and creates their associated response.
+ * 
+ * @author Dave
+ * 
+ */
+@Path("/fizzit")
 public class FizzBuzzService {
 	
 	final Logger log = LoggerFactory.getLogger(FizzBuzzService.class);
 	
+	/**
+	 * 
+	 * Takes in post requests to the application and returns a response.
+	 * 
+	 * @param numberList Data from the form as a list of numbers
+	 * @return Returns either an error message or the correctly formatted result
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String go(@FormParam("numbers") final String numberList) {		
+	public String go(@FormParam("numbers") String numberList) {		
 		
 		log.info("Request received: {}", numberList);
 		
 		String returnMessage;
 		
-		try {		
+		try {
+			numberList = Core.sanitizeData(numberList);
+			
 			Core.validateData(numberList);
 			
-			returnMessage = Core.giveOutput(numberList);
+			returnMessage = Core.convertToFizzBuzzFormat(numberList);
 		} catch (ValidationException e) {
 			returnMessage = ErrorMessages.VALIDATION_ERROR; 
 		} catch (Exception e) {
